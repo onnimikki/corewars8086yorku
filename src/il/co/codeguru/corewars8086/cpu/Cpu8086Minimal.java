@@ -84,6 +84,7 @@ public class Cpu8086Minimal {
             case 0xF0:
                 opcodeFX(opcode);
                 break;
+            /* to-do: should a default go here? -JS */
         }
     }
 
@@ -150,30 +151,38 @@ public class Cpu8086Minimal {
         }
     }
 
-    private void opcode1X(byte opcode) throws MemoryException {
+    /* modified by JS to replace good opcodes with unimplemented.
+    *  ADC and SBB removed, but stack operations PUSH and POP kept. */
+    private void opcode1X(byte opcode) throws MemoryException, UnimplementedOpcodeException {
         switch (opcode) {
             case (byte)0x10: // ADC [X], reg8
-                m_indirect.reset();
-                m_indirect.setMem8(adc8(m_indirect.getMem8(), m_indirect.getReg8()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setMem8(adc8(m_indirect.getMem8(), m_indirect.getReg8()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x11: // ADC [X], reg16
-                m_indirect.reset();
-                m_indirect.setMem16(adc16(m_indirect.getMem16(), m_indirect.getReg16()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setMem16(adc16(m_indirect.getMem16(), m_indirect.getReg16()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x12: // ADC reg8, [X]
-                m_indirect.reset();
-                m_indirect.setReg8(adc8(m_indirect.getReg8(), m_indirect.getMem8()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setReg8(adc8(m_indirect.getReg8(), m_indirect.getMem8()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x13: // ADC reg16, [X]
-                m_indirect.reset();
-                m_indirect.setReg16(adc16(m_indirect.getReg16(), m_indirect.getMem16()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setReg16(adc16(m_indirect.getReg16(), m_indirect.getMem16()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x14: // ADC AL, imm8
-                m_state.setAL(adc8(m_state.getAL(), m_fetcher.nextByte()));
-                break;
+//                m_state.setAL(adc8(m_state.getAL(), m_fetcher.nextByte()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x15: // ADC AX, imm16
-                m_state.setAX(adc16(m_state.getAX(), m_fetcher.nextWord()));
-                break;
+//                m_state.setAX(adc16(m_state.getAX(), m_fetcher.nextWord()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x16: // PUSH SS
                 push(m_state.getSS());
                 break;
@@ -181,27 +190,33 @@ public class Cpu8086Minimal {
                 m_state.setSS(pop());
                 break;
             case (byte)0x18: // SBB [X], reg8
-                m_indirect.reset();
-                m_indirect.setMem8(sbb8(m_indirect.getMem8(), m_indirect.getReg8()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setMem8(sbb8(m_indirect.getMem8(), m_indirect.getReg8()));
+//
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x19: // SBB [X], reg16
-                m_indirect.reset();
-                m_indirect.setMem16(sbb16(m_indirect.getMem16(), m_indirect.getReg16()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setMem16(sbb16(m_indirect.getMem16(), m_indirect.getReg16()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x1A: // SBB reg8, [X]
-                m_indirect.reset();
-                m_indirect.setReg8(sbb8(m_indirect.getReg8(), m_indirect.getMem8()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setReg8(sbb8(m_indirect.getReg8(), m_indirect.getMem8()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x1B: // SBB reg16, [X]
-                m_indirect.reset();
-                m_indirect.setReg16(sbb16(m_indirect.getReg16(), m_indirect.getMem16()));
-                break;
+//                m_indirect.reset();
+//                m_indirect.setReg16(sbb16(m_indirect.getReg16(), m_indirect.getMem16()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x1C: // SBB AL, imm8
-                m_state.setAL(sbb8(m_state.getAL(), m_fetcher.nextByte()));
-                break;
+//                m_state.setAL(sbb8(m_state.getAL(), m_fetcher.nextByte()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x1D: // SBB AX, imm16
-                m_state.setAX(sbb16(m_state.getAX(), m_fetcher.nextWord()));
-                break;
+//                m_state.setAX(sbb16(m_state.getAX(), m_fetcher.nextWord()));
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x1E: // PUSH DS
                 push(m_state.getDS());
                 break;
@@ -468,85 +483,89 @@ public class Cpu8086Minimal {
         }
     }
 
-    private void opcode8X(byte opcode) throws CpuException, MemoryException {
+    // modified to get rid of ptr
+    // -JS Oct 2026.
+    private void opcode8X(byte opcode) throws CpuException, MemoryException, UnimplementedOpcodeException {
         switch (opcode) {
             case (byte)0x80: // <?> byte ptr [X], imm8
             case (byte)0x82: // TODO: opcode 0x82 is identical to opcode 0x80 ?
-                m_indirect.reset();
-                switch (m_indirect.getRegIndex()) {
-                    case 0: // ADD
-                        m_indirect.setMem8(
-                                add8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 1: // OR
-                        m_indirect.setMem8(
-                                or8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 2: // ADC
-                        m_indirect.setMem8(
-                                adc8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 3: // SBB
-                        m_indirect.setMem8(
-                                sbb8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 4: // AND
-                        m_indirect.setMem8(
-                                and8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 5: // SUB
-                        m_indirect.setMem8(
-                                sub8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 6: // XOR
-                        m_indirect.setMem8(
-                                xor8(m_indirect.getMem8(), m_fetcher.nextByte()));
-                        break;
-                    case 7: // CMP
-                        sub8(m_indirect.getMem8(), m_fetcher.nextByte());
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-                break;
+//                m_indirect.reset();
+//                switch (m_indirect.getRegIndex()) {
+//                    case 0: // ADD
+//                        m_indirect.setMem8(
+//                                add8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 1: // OR
+//                        m_indirect.setMem8(
+//                                or8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 2: // ADC
+//                        m_indirect.setMem8(
+//                                adc8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 3: // SBB
+//                        m_indirect.setMem8(
+//                                sbb8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 4: // AND
+//                        m_indirect.setMem8(
+//                                and8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 5: // SUB
+//                        m_indirect.setMem8(
+//                                sub8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 6: // XOR
+//                        m_indirect.setMem8(
+//                                xor8(m_indirect.getMem8(), m_fetcher.nextByte()));
+//                        break;
+//                    case 7: // CMP
+//                        sub8(m_indirect.getMem8(), m_fetcher.nextByte());
+//                        break;
+//                    default:
+//                        throw new RuntimeException();
+//                }
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x81: // <?> word ptr [X], imm16
-                m_indirect.reset();
-                switch (m_indirect.getRegIndex()) {
-                    case 0: // ADD
-                        m_indirect.setMem16(
-                                add16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 1: // OR
-                        m_indirect.setMem16(
-                                or16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 2: // ADC
-                        m_indirect.setMem16(
-                                adc16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 3: // SBB
-                        m_indirect.setMem16(
-                                sbb16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 4: // AND
-                        m_indirect.setMem16(
-                                and16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 5: // SUB
-                        m_indirect.setMem16(
-                                sub16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 6: // XOR
-                        m_indirect.setMem16(
-                                xor16(m_indirect.getMem16(), m_fetcher.nextWord()));
-                        break;
-                    case 7: // CMP
-                        sub16(m_indirect.getMem16(), m_fetcher.nextWord());
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-                break;
+//                m_indirect.reset();
+//                switch (m_indirect.getRegIndex()) {
+//                    case 0: // ADD
+//                        m_indirect.setMem16(
+//                                add16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 1: // OR
+//                        m_indirect.setMem16(
+//                                or16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 2: // ADC
+//                        m_indirect.setMem16(
+//                                adc16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 3: // SBB
+//                        m_indirect.setMem16(
+//                                sbb16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 4: // AND
+//                        m_indirect.setMem16(
+//                                and16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 5: // SUB
+//                        m_indirect.setMem16(
+//                                sub16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 6: // XOR
+//                        m_indirect.setMem16(
+//                                xor16(m_indirect.getMem16(), m_fetcher.nextWord()));
+//                        break;
+//                    case 7: // CMP
+//                        sub16(m_indirect.getMem16(), m_fetcher.nextWord());
+//                        break;
+//                    default:
+//                        throw new RuntimeException();
+//                }
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x83: // <?> word ptr [X], sign-extended imm8
                 m_indirect.reset();
                 switch (m_indirect.getRegIndex()) {
@@ -585,26 +604,32 @@ public class Cpu8086Minimal {
                         throw new RuntimeException();
                 }
                 break;
+              //  throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x84: // TEST reg8, [X]
-                m_indirect.reset();
-                and8(m_indirect.getReg8(), m_indirect.getMem8());
-                break;
+//                m_indirect.reset();
+//                and8(m_indirect.getReg8(), m_indirect.getMem8());
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x85: // TEST reg16, [X]
-                m_indirect.reset();
-                and16(m_indirect.getReg16(), m_indirect.getMem16());
-                break;
+//                m_indirect.reset();
+//                and16(m_indirect.getReg16(), m_indirect.getMem16());
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x86: // XCHG reg8, [X]
-                m_indirect.reset();
-                byte tmpByte = m_indirect.getReg8();
-                m_indirect.setReg8(m_indirect.getMem8());
-                m_indirect.setMem8(tmpByte);
-                break;
+//                m_indirect.reset();
+//                byte tmpByte = m_indirect.getReg8();
+//                m_indirect.setReg8(m_indirect.getMem8());
+//                m_indirect.setMem8(tmpByte);
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
+
             case (byte)0x87: // XCHG reg16, [X]
-                m_indirect.reset();
-                short tmpWord = m_indirect.getReg16();
-                m_indirect.setReg16(m_indirect.getMem16());
-                m_indirect.setMem16(tmpWord);
-                break;
+//                m_indirect.reset();
+//                short tmpWord = m_indirect.getReg16();
+//                m_indirect.setReg16(m_indirect.getMem16());
+//                m_indirect.setMem16(tmpWord);
+//                break;
+                throw new UnimplementedOpcodeException();  // JS inserted Oct 2026
             case (byte)0x88: // MOV [X], reg8
                 m_indirect.reset();
                 m_indirect.setMem8(m_indirect.getReg8());
