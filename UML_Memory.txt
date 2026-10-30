@@ -72,13 +72,21 @@ interface RealModeMemory {
 }
 
 
+interface MemoryEventListener {
+     + onMemoryWrite(address : RealModeAddress) : void
+}
 
+' https://docs.oracle.com/javase/8/docs/api/java/util/EventListener.html
+interface EventListener{
+// Common Java Interface
+}
 
 
 ' Note direction of arrow to RealModeMemory: this helps make hierarchy top-down.
 RealModeMemory <|.. AbstractRealModeMemory
 RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
 RealModeMemoryImpl --|> AbstractRealModeMemory
+EventListener <|.. MemoryEventListener
 
 ' Optional hidden links to keep subclasses aligned underneath
 RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
@@ -102,6 +110,10 @@ end note
 
 note left of RealModeAddress
 import utils.Unsigned
+end note
+
+note left of MemoryEventListener
+import util.EventListener
 end note
 
 
