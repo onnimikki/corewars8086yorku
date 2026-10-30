@@ -1,0 +1,51 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+top to bottom direction
+
+abstract class AbstractRealModeMemory {
+    {abstract} + readByte(address : RealModeAddress) : byte
+    + readWord(address : RealModeAddress) : short
+    {abstract} + writeByte(address : RealModeAddress, value : byte) : void
+    + writeWord(address : RealModeAddress, value : short) : void
+    {abstract} + readExecuteByte(address : RealModeAddress) : byte
+    + readExecuteWord(address : RealModeAddress) : short
+}
+
+class RestrictedAccessRealModeMemory {
+    + myMethod(myinput : int) : byte
+}
+
+class RealModeMemoryImpl {
+    - listener : MemoryEventListener
+    - m_data : byte[]
+    + readByte(address : RealModeAddress) : byte
+    + writeByte(address : RealModeAddress, value: byte) : void
+    + readExecuteByte(address: RealModeAddress) : byte
+    + getListener(void) : MemoryEventListener
+    + setListener(listener : MemoryEventListener) : void
+}
+
+interface RealModeMemory {
+    {abstract} + readByte(address : RealModeAddress) : byte
+    {abstract} + readWord(address : RealModeAddress) : short
+    {abstract} + writeByte(address : RealModeAddress, value : byte) : byte
+    {abstract} + writeWord(address : RealModeAddress, value : short) : short
+    {abstract} + readExecuteWord(address : RealModeAddress) : short
+}
+
+RealModeMemory <|.. AbstractRealModeMemory
+RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
+RealModeMemoryImpl --|> AbstractRealModeMemory
+
+' Optional hidden links to keep subclasses aligned underneath
+RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
+
+note right of RealModeMemory
+all methods throw MemoryException
+end note
+
+AbstractRealModeMemory -[hidden]down-> RestrictedAccessRealModeMemory
+AbstractRealModeMemory -[hidden]down-> RealModeMemoryImpl
+
+@enduml
