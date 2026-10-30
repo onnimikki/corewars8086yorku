@@ -121,7 +121,7 @@ RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
 
 
 ' This shows RealModeMemoryRegion depends on / uses RealModeAddress
-RealModeMemoryRegion ..> RealModeAddress : uses >
+RealModeMemoryRegion <.. RealModeAddress : uses <
 
 ' ----------------- Notes -------------------------
 note right of RealModeMemory
