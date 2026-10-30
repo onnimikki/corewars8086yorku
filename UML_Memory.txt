@@ -4,6 +4,8 @@ skinparam classAttributeIconSize 0
 ' --------------------------------------------------------
 ' References: 
 ' 1. Constructors: https://stackoverflow.com/questions/4006868/constructor-with-parameters-in-uml-class-diagram
+' 2. Static and final (underline and {readOnly} https://stackoverflow.com/questions/41870513/how-to-show-attribute-as-readonly-in-uml
+'
 ' oct 2026 James Andrew Smith
 ' --------------------------------------------------------
 top to bottom direction
@@ -18,10 +20,10 @@ abstract class AbstractRealModeMemory {
 }
 
 class RestrictedAccessRealModeMemory {
-    - m_memory : RealModeMemory
-    - m_readAccessRegions : RealModeMemoryRegion[]
-    - m_writeAccessRegions : RealModeMemoryRegion[] 
-    - m_executeAccessRegions : RealModeMemoryRegion[]
+    - m_memory : RealModeMemory <<readOnly>>
+    - m_readAccessRegions : RealModeMemoryRegion[] <<readOnly>>
+    - m_writeAccessRegions : RealModeMemoryRegion[]  <<readOnly>>
+    - m_executeAccessRegions : RealModeMemoryRegion[] <<readOnly>>
 
     + <<create>> RestrictedAccessRealModeMemory(memory : RealModeMemory, 
 readAccessRegions : RealModeMemoryRegion[], 
@@ -35,9 +37,22 @@ executeAccessRegions : RealModeMemoryRegion [])
 
 }
 
+class RealModeMemoryRegion{
+    - m_start : RealModeAddress <<readOnly>>
+    - m_end : RealModeAddress <<readOnly>>
+ + <<create>> RealModeMemoryRegion(start : RealModeAddress, 
+            end : RealModeAddress)
+    + boolean isInRegion(address : RealModeAddress)
+}
+
 class RealModeAddress {
-    - m_segment: short
-    - m_offset: short
+    {static} + NUM_PARAGRAPHS: int <<readOnly>>
+    {static} + PARAGRAPH_SIZE: int <<readOnly>>
+    {static} + PARAGRAPHS_IN_SEGMENT: int <<readOnly>>
+    {static} + MEMORY_SIZE: int <<readOnly>>
+
+    - m_segment: short <<readOnly>>
+    - m_offset: short <<readOnly>>
     - m_linearAddress: short
 
     + <<create>> RealModeAddress(segment : short, offset short)
@@ -76,20 +91,37 @@ interface MemoryEventListener {
      + onMemoryWrite(address : RealModeAddress) : void
 }
 
+' final is underlined.
+class MemoryException {
+ {static}  - serialVersionUID : long <<readOnly>>
+}
+
+
+
 ' https://docs.oracle.com/javase/8/docs/api/java/util/EventListener.html
 interface EventListener{
 // Common Java Interface
 }
 
+' https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html
+class Exception{
+// Common Java Class
+}
 
 ' Note direction of arrow to RealModeMemory: this helps make hierarchy top-down.
 RealModeMemory <|.. AbstractRealModeMemory
 RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
 RealModeMemoryImpl --|> AbstractRealModeMemory
 EventListener <|.. MemoryEventListener
+Throwable <|.. Exception
+Exception <|.. MemoryException
 
 ' Optional hidden links to keep subclasses aligned underneath
 RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
+
+
+' This shows RealModeMemoryRegion depends on / uses RealModeAddress
+RealModeMemoryRegion ..> RealModeAddress : uses >
 
 ' ----------------- Notes -------------------------
 note right of RealModeMemory
