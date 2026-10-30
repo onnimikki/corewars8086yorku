@@ -1,0 +1,84 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' --------------------------------------------------------
+' References: 
+' 1. Constructors: https://stackoverflow.com/questions/4006868/constructor-with-parameters-in-uml-class-diagram
+' 2. Static and final (underline and {readOnly} https://stackoverflow.com/questions/41870513/how-to-show-attribute-as-readonly-in-uml
+'
+' oct 2026 James Andrew Smith
+' --------------------------------------------------------
+top to bottom direction
+
+
+class RestrictedAccessRealModeMemory {
+    - m_memory : RealModeMemory <<readOnly>>
+    - m_readAccessRegions : RealModeMemoryRegion[] <<readOnly>>
+    - m_writeAccessRegions : RealModeMemoryRegion[]  <<readOnly>>
+    - m_executeAccessRegions : RealModeMemoryRegion[] <<readOnly>>
+
+    + <<create>> RestrictedAccessRealModeMemory(memory : RealModeMemory, 
+readAccessRegions : RealModeMemoryRegion[], 
+writeAccessionRegions : RealModeMemoryRegion[], 
+executeAccessRegions : RealModeMemoryRegion [])
+
+    + readByte(address : RealModeAddress) : byte
+    + writeByte(address : RealModeAddress, value : byte) : void
+    + readExecuteByte(address : RealModeAddress) : byte
+    + isAddressInRegions(regions : RealModeMemoryRegion[], address : RealModeAddress) : byte
+
+}
+
+
+
+interface MemoryEventListener {
+     + onMemoryWrite(address : RealModeAddress) : void
+}
+
+' final is underlined.
+class MemoryException {
+ {static}  - serialVersionUID : long <<readOnly>>
+}
+
+
+
+' https://docs.oracle.com/javase/8/docs/api/java/util/EventListener.html
+interface EventListener{
+// Common Java Interface
+}
+
+' https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html
+class Exception{
+// Common Java Class
+}
+
+' Note direction of arrow to RealModeMemory: this helps make hierarchy top-down.
+RealModeMemory <|.. AbstractRealModeMemory
+RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
+RealModeMemoryImpl --|> AbstractRealModeMemory
+EventListener <|.. MemoryEventListener
+Throwable <|.. Exception
+Exception <|.. MemoryException
+
+' Optional hidden links to keep subclasses aligned underneath
+RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
+
+
+' This shows RealModeMemoryRegion depends on / uses RealModeAddress
+RealModeMemoryRegion <.. RealModeAddress : uses <
+
+' ----------------- Notes -------------------------
+note right of RealModeMemory
+all methods throw MemoryException
+end note
+
+
+
+note left of MemoryEventListener
+import util.EventListener
+end note
+
+
+AbstractRealModeMemory -[hidden]down-> RestrictedAccessRealModeMemory
+AbstractRealModeMemory -[hidden]down-> RealModeMemoryImpl
+@enduml
