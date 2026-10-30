@@ -1,5 +1,18 @@
 @startuml
+top to bottom direction
 skinparam classAttributeIconSize 0
+
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/Cpu.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/CpuException.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/CpuState.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/DivisionException.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/IndirectAddressingDecoder.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/IntOpcodeException.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/InvalidOpcodeException.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/OpcodeFetcher.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/RegisterIndexingDecoder.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/UnimplementedOpcodeException.java
+' https://raw.githubusercontent.com/codeguru-il/corewars8086/refs/heads/master/src/main/java/il/co/codeguru/corewars8086/cpu/UnsupportedOpcodeException.java
 
 ' --------------------------------------------------------
 ' References: 
@@ -8,77 +21,191 @@ skinparam classAttributeIconSize 0
 '
 ' oct 2026 James Andrew Smith
 ' --------------------------------------------------------
-top to bottom direction
 
 
-class RestrictedAccessRealModeMemory {
-    - m_memory : RealModeMemory <<readOnly>>
-    - m_readAccessRegions : RealModeMemoryRegion[] <<readOnly>>
-    - m_writeAccessRegions : RealModeMemoryRegion[]  <<readOnly>>
-    - m_executeAccessRegions : RealModeMemoryRegion[] <<readOnly>>
 
-    + <<create>> RestrictedAccessRealModeMemory(memory : RealModeMemory, 
-readAccessRegions : RealModeMemoryRegion[], 
-writeAccessionRegions : RealModeMemoryRegion[], 
-executeAccessRegions : RealModeMemoryRegion [])
 
-    + readByte(address : RealModeAddress) : byte
-    + writeByte(address : RealModeAddress, value : byte) : void
-    + readExecuteByte(address : RealModeAddress) : byte
-    + isAddressInRegions(regions : RealModeMemoryRegion[], address : RealModeAddress) : byte
 
+'==================================================
+' Exception Hierarchy
+'==================================================
+
+abstract class CpuException
+
+class DivisionException
+class InvalidOpcodeException
+class IntOpcodeException
+class UnimplementedOpcodeException
+class UnsupportedOpcodeException
+
+Exception <|-- CpuException
+
+CpuException <|-- DivisionException
+CpuException <|-- InvalidOpcodeException
+CpuException <|-- IntOpcodeException
+CpuException <|-- UnimplementedOpcodeException
+CpuException <|-- UnsupportedOpcodeException
+
+
+'==================================================
+' Core CPU Classes
+'==================================================
+
+class Cpu {
+    - m_state : CpuState
+    - m_memory : RealModeMemory
+    - m_fetcher : OpcodeFetcher
+    - m_regs : RegisterIndexingDecoder
+    - m_indirect : IndirectAddressingDecoder
+
+    + Cpu(state : CpuState, memory : RealModeMemory)
+    + nextOpcode()
+}
+
+class CpuState {
+    - m_ax : short
+    - m_bx : short
+    - m_cx : short
+    - m_dx : short
+
+    - m_ds : short
+    - m_es : short
+    - m_si : short
+    - m_di : short
+
+    - m_ss : short
+    - m_bp : short
+    - m_sp : short
+
+    - m_cs : short
+    - m_ip : short
+    - m_flags : short
+
+    - m_energy : short
+    - m_bomb1count : byte
+    - m_bomb2count : byte
+
+    + getAX() : short
+    + getBX() : short
+    + getCX() : short
+    + getDX() : short
+
+    + setAX(short)
+    + setBX(short)
+    + setCX(short)
+    + setDX(short)
+
+    + getAL() : byte
+    + getAH() : byte
+    + getBL() : byte
+    + getBH() : byte
+    + getCL() : byte
+    + getCH() : byte
+    + getDL() : byte
+    + getDH() : byte
+
+    + setAL(byte)
+    + setAH(byte)
+
+    + getFlags() : short
+    + setFlags(short)
+}
+
+class OpcodeFetcher {
+    - m_state : CpuState
+    - m_memory : RealModeMemory
+
+    + OpcodeFetcher(state : CpuState, memory : RealModeMemory)
+    + nextByte() : byte
+    + nextWord() : short
+}
+
+class RegisterIndexingDecoder {
+    - m_state : CpuState
+
+    + getReg8(index : byte) : byte
+    + setReg8(index : byte, value : byte)
+
+    + getReg16(index : byte) : short
+    + setReg16(index : byte, value : short)
+
+    + getSeg(index : byte) : short
+    + setSeg(index : byte, value : short)
+}
+
+class IndirectAddressingDecoder {
+    - m_state : CpuState
+    - m_memory : RealModeMemory
+    - m_fetcher : OpcodeFetcher
+    - m_regs : RegisterIndexingDecoder
+
+    - m_regIndex : byte
+    - m_memIndex : byte
+    - m_memAddress : RealModeAddress
+
+    + reset()
+
+    + getRegIndex() : byte
+    + getMemAddress() : RealModeAddress
+
+    + getReg8() : byte
+    + getMem8() : byte
+
+    + getReg16() : short
+    + getMem16() : short
+
+    + getSeg() : short
+
+    + setReg8(byte)
+    + setMem8(byte)
+
+    + setReg16(short)
+    + setMem16(short)
+
+    + setSeg(short)
 }
 
 
+'==================================================
+' External Types
+'==================================================
 
-interface MemoryEventListener {
-     + onMemoryWrite(address : RealModeAddress) : void
-}
-
-' final is underlined.
-class MemoryException {
- {static}  - serialVersionUID : long <<readOnly>>
-}
-
+interface RealModeMemory
+class RealModeAddress
+class MemoryException
+class Unsigned
 
 
-' https://docs.oracle.com/javase/8/docs/api/java/util/EventListener.html
-interface EventListener{
-// Common Java Interface
-}
+'==================================================
+' Relationships
+'==================================================
 
-' https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html
-class Exception{
-// Common Java Class
-}
+Cpu *-- OpcodeFetcher
+Cpu *-- RegisterIndexingDecoder
+Cpu *-- IndirectAddressingDecoder
 
-' Note direction of arrow to RealModeMemory: this helps make hierarchy top-down.
-RealModeMemory <|.. AbstractRealModeMemory
-RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
-RealModeMemoryImpl --|> AbstractRealModeMemory
-EventListener <|.. MemoryEventListener
-Throwable <|.. Exception
-Exception <|.. MemoryException
+Cpu --> CpuState
+Cpu --> RealModeMemory
 
-' Optional hidden links to keep subclasses aligned underneath
-RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
+Cpu ..> CpuException
+Cpu ..> MemoryException
+Cpu ..> RealModeAddress
+Cpu ..> Unsigned
 
+OpcodeFetcher --> CpuState
+OpcodeFetcher --> RealModeMemory
+OpcodeFetcher ..> RealModeAddress
+OpcodeFetcher ..> MemoryException
 
-' This shows RealModeMemoryRegion depends on / uses RealModeAddress
-RealModeMemoryRegion <.. RealModeAddress : uses <
+RegisterIndexingDecoder --> CpuState
 
-' ----------------- Notes -------------------------
-note right of RealModeMemory
-all methods throw MemoryException
-end note
+IndirectAddressingDecoder --> CpuState
+IndirectAddressingDecoder --> RealModeMemory
+IndirectAddressingDecoder --> OpcodeFetcher
+IndirectAddressingDecoder *-- RegisterIndexingDecoder
+IndirectAddressingDecoder --> RealModeAddress
+IndirectAddressingDecoder ..> MemoryException
 
+CpuState ..> Unsigned
 
-
-note left of MemoryEventListener
-import util.EventListener
-end note
-
-
-AbstractRealModeMemory -[hidden]down-> RestrictedAccessRealModeMemory
-AbstractRealModeMemory -[hidden]down-> RealModeMemoryImpl
 @enduml
