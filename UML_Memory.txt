@@ -1,6 +1,11 @@
 @startuml
 skinparam classAttributeIconSize 0
 
+' --------------------------------------------------------
+' References: 
+' 1. Constructors: https://stackoverflow.com/questions/4006868/constructor-with-parameters-in-uml-class-diagram
+' oct 2026 James Andrew Smith
+' --------------------------------------------------------
 top to bottom direction
 
 abstract class AbstractRealModeMemory {
@@ -13,12 +18,44 @@ abstract class AbstractRealModeMemory {
 }
 
 class RestrictedAccessRealModeMemory {
-    + myMethod(myinput : int) : byte
+    - m_memory : RealModeMemory
+    - m_readAccessRegions : RealModeMemoryRegion[]
+    - m_writeAccessRegions : RealModeMemoryRegion[] 
+    - m_executeAccessRegions : RealModeMemoryRegion[]
+
+    + <<create>> RestrictedAccessRealModeMemory(memory : RealModeMemory, 
+readAccessRegions : RealModeMemoryRegion[], 
+writeAccessionRegions : RealModeMemoryRegion[], 
+executeAccessRegions : RealModeMemoryRegion [])
+
+    + readByte(address : RealModeAddress) : byte
+    + writeByte(address : RealModeAddress, value : byte) : void
+    + readExecuteByte(address : RealModeAddress) : byte
+    + isAddressInRegions(regions : RealModeMemoryRegion[], address : RealModeAddress) : byte
+
 }
+
+class RealModeAddress {
+    - m_segment: short
+    - m_offset: short
+    - m_linearAddress: short
+
+    + <<create>> RealModeAddress(segment : short, offset short)
+    + <<create>> RealModeAddress(linearAddress : int)
+
+    + getSegment(void) : short
+    + getOffset(void) : short
+    + getLinearAddress(void) : int
+
+}
+
 
 class RealModeMemoryImpl {
     - listener : MemoryEventListener
     - m_data : byte[]
+
+    + <<create>> RealModeMemoryImpl()
+
     + readByte(address : RealModeAddress) : byte
     + writeByte(address : RealModeAddress, value: byte) : void
     + readExecuteByte(address: RealModeAddress) : byte
@@ -34,6 +71,11 @@ interface RealModeMemory {
     {abstract} + readExecuteWord(address : RealModeAddress) : short
 }
 
+
+
+
+
+' Note direction of arrow to RealModeMemory: this helps make hierarchy top-down.
 RealModeMemory <|.. AbstractRealModeMemory
 RestrictedAccessRealModeMemory --|> AbstractRealModeMemory
 RealModeMemoryImpl --|> AbstractRealModeMemory
@@ -41,11 +83,28 @@ RealModeMemoryImpl --|> AbstractRealModeMemory
 ' Optional hidden links to keep subclasses aligned underneath
 RestrictedAccessRealModeMemory -[hidden]- RealModeMemoryImpl
 
+' ----------------- Notes -------------------------
 note right of RealModeMemory
 all methods throw MemoryException
 end note
 
+note right of AbstractRealModeMemory
+all methods throw MemoryException
+end note
+
+note right of RestrictedAccessRealModeMemory
+public methods throw MemoryException
+end note
+
+note left of AbstractRealModeMemory
+import utils.Unsigned
+end note
+
+note left of RealModeAddress
+import utils.Unsigned
+end note
+
+
 AbstractRealModeMemory -[hidden]down-> RestrictedAccessRealModeMemory
 AbstractRealModeMemory -[hidden]down-> RealModeMemoryImpl
-
 @enduml
