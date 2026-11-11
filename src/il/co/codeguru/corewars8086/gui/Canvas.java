@@ -19,9 +19,10 @@ import javax.swing.event.MouseInputListener;
  */
 public class Canvas extends JComponent implements MouseInputListener {
 	private static final long serialVersionUID = 1L;
-	
-	public static final int BOARD_SIZE = 256;
-    public static final int DOT_SIZE = 3;
+
+	/* originally, BOARD_SIZE was 256 and DOT_SIZE was 3 */
+	public static final int BOARD_SIZE = 512;	// 256 originally -- doesn't appear to give enough space on screen.
+    public static final int DOT_SIZE = 5;		// 3 originally.
     public static final byte EMPTY = -1;
 
     private  byte[][] data;
