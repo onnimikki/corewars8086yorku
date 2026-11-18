@@ -64,7 +64,8 @@ public class WarFrame extends JFrame
 	private WarEffectsHandler effectsHandler;
 
     public WarFrame(final Competition competition) {
-        super("CodeGuru Extreme - Session Viewer");
+        // super("CodeGuru Extreme - Session Viewer");          // Original.  Commented out by JS
+         super("CodeWars 8086 - Session Viewer (War frame)");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.competition = competition;
         getContentPane().setLayout(new BorderLayout());
@@ -80,7 +81,7 @@ public class WarFrame extends JFrame
         canvasPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(169,154,133),3), 
             BorderFactory.createEmptyBorder(10,10,20,10)));
-        canvasPanel.setBackground(Color.BLACK);
+        canvasPanel.setBackground(Color.GRAY);  // was black.  By making it gray then you can better see valid memory outline.
         warCanvas = new Canvas();
         canvasPanel.add(warCanvas);
         warZone.add(canvasPanel, BorderLayout.CENTER);
@@ -165,7 +166,7 @@ public class WarFrame extends JFrame
 
         // build warrior zone (warrior list + title) 
         JPanel warriorZone = new JPanel(new BorderLayout());
-        warriorZone.setBackground(Color.BLACK);
+        warriorZone.setBackground(Color.DARK_GRAY);  // JS: was black
         nameListModel = new DefaultListModel();
         nameList = new JList(nameListModel);
         nameList.setPreferredSize(new Dimension(200,0));
