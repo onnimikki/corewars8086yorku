@@ -129,13 +129,14 @@ public class WarriorRepository {
                 currentGroup.addWarrior(readWarriorFile(file, WarriorType.SURVIVOR_2));
                 warriorNameToGroup.put(name, warriorGroups.size());
                 warriorGroups.add(currentGroup);
-                currentGroup = null;
+                currentGroup = null;  // Don't retain group name -- prevents others from being added into it.
             } else {
+                // JS: no number suffix?  Warrior is in a group of 1.
                 currentGroup = new WarriorGroup(name);
                 currentGroup.addWarrior(readWarriorFile(file, WarriorType.SURVIVOR));
                 warriorNameToGroup.put(name, warriorGroups.size());
                 warriorGroups.add(currentGroup);
-                currentGroup = null;
+                currentGroup = null;  // Don't retain the group name.  No one will get added to it.
             }
         }
     }
@@ -210,7 +211,24 @@ public class WarriorRepository {
 
     public void saveScoresToFile(String filename) {
         System.out.printf("Writing scores to file %s%n", filename);
-        
+//        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//        // ------------------- James Smith debug.
+//        // debug:
+//        System.out.println("Warrior Groups");  // debug
+//
+//        for(var groupName : warriorGroups){
+//            // name the group
+//            System.out.print("Group name: ");
+//            System.out.println(groupName.getName());
+//            for (var eachWarrior : groupName.getWarriors()){
+//                // name the warrior
+//                System.out.print("Warrior name: ");
+//                System.out.println(eachWarrior.getName());
+//            }
+//        }
+//        System.out.println(warriorGroups); // debug
+//        // ----------------
+//        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         try (FileOutputStream fos = new FileOutputStream(filename)) {
             PrintStream ps = new PrintStream(fos);
             ps.print("Groups:\n");
