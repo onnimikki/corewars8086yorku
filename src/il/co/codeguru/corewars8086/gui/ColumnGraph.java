@@ -130,7 +130,7 @@ public class ColumnGraph extends JComponent {
         int height2 = (int) (reduceFactor*values[col][2]);
         int boxTopY = startHeight - height1 - height2;
         g.fill3DRect(col*width, boxTopY, width, height2, false);
-        g.drawString("Score: " + (int)(values[col][0] * 10)/10.0f, col*width, boxTopY - 5); // write warrior score above column.
+        g.drawString("Score: " + (int)((values[col][0] * 10)/10.0f), col*width, boxTopY - 5); // write warrior score above column.
 
 
         if (isTopTeam(col)) {
