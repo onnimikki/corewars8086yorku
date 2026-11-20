@@ -42,7 +42,7 @@ public class Options extends OptionsBase {
       name = "totalBattles",
       help = "Total amount of battles. Overrides comboSize and battlesPerCombo if more than zero.",
       category = "Gameplay",
-      defaultValue = "0"
+      defaultValue = "10" // JS: was 0
   )
   public int totalBattles;
   
@@ -68,7 +68,7 @@ public class Options extends OptionsBase {
       abbrev = 'p',
       help = "Run multiple battles concurrently - cancel for (pre-)cgx2022 result emulation",
       category = "Concurrency",
-      defaultValue = "true"
+      defaultValue = "false" // Js: was true.
   )
   public boolean parallel;
   
