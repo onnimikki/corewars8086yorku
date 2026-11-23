@@ -59,10 +59,20 @@ public class Options extends OptionsBase {
       name = "zombieSpeed",
       help = "Number of turns zombies play per round",
       category = "Gameplay",
-      defaultValue = "2"
+      defaultValue = "1" // used to be 2.  JS makes it 1.
   )
   public int zombieSpeed;
-  
+
+  // If player speed is set to 1 then nextRound() method will only have one opcode per round for players.
+  // shouldRunExtraOpcode() should return false thus skipping the extra opcode in nextRound.
+  @Option(
+          name = "playerSpeed",
+          help = "Number of turns regular players play per round",
+          category = "Gameplay",
+          defaultValue = "1" // used to not exist.  JS makes it 1.
+  )
+  public int playerSpeed;
+
   @Option(
       name = "parallel",
       abbrev = 'p',
